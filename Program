@@ -1,0 +1,86 @@
+import mysql.connector as sqltor
+mycon=sqltor.connect(host="localhost", user="root", password="darkie503", charset="utf8")
+cursor=mycon.cursor()
+
+cursor.execute("create database if not exists amit")
+cursor.execute("use amit")
+cursor.execute("create table if not exists UT(roll_no int,name char(30),sub char(30),marks int)")
+
+def prt(data):
+     print("[Roll No.]              [Name]                 [Subject]             [Marks] ")
+     for i in data:
+         print(i[0],i[1],i[2],i[3],sep="\t | \t ")
+         print("\n"*3)
+
+def creation():
+    while True:
+        #count=int(input("How many records u wants to enter?:"))
+        #for i in range (count):
+        #while True:
+        rno=int(input("Enter Student Roll no. "))
+        nm=input("Enter Name of Student: ")
+        snm=input("Enter Subject name: ")
+        marks=int(input("Enter Marks scored: "))
+        cursor.execute("insert into UT values({},'{}','{}',{})".format(rno,nm,snm,marks))
+        reinst=input("Press 'N' to stop taking records, else press enter")
+        print("\n"*2)
+        if reinst.upper()=='N':
+            mycon.commit()
+            break
+        
+def searching():
+    print("Enter 1 for Search by Roll no.")
+    print("Enter 2 for Search by name of student")
+    choice=int(input("enter your choice"))
+    if choice==1:
+        srno=int(input("Enter Roll no. to search a record: "))
+        cursor.execute("select * from ut where roll_no=({})".format(srno))
+        data=cursor.fetchall()
+        prt(data)
+    elif choice==2:
+        sname=input("Enter name of student to search a record: ")
+        cursor.execute("select * from ut where name=('{}')".format(sname))
+        data=cursor.fetchall()
+        prt(data)
+    else:
+        print("Invalid choice entered!, Please enter correct option")
+        
+def updation():
+    ch=int(input("Enter 1 for marks, 2 for subject updation: "))
+    if ch==1:
+        rnoask=int(input("Enter rollno. of student:"))
+        cursor.execute("select * from ut where roll_no=({})".format(rnoask))
+        data=cursor.fetchall()
+        prt(data)
+        mrks=int(input("Enter new marks of student:"))
+        cursor.execute("update ut set marks = ({}) where roll_no=({})".format(mrks,rnoask))
+        print("Marks changed successfully, New record is:")
+        cursor.execute("select * from ut where roll_no=({})".format(rnoask))
+        data=cursor.fetchall()
+        prt(data)
+        
+def display():
+    cursor.execute("select * from ut ")
+    data=cursor.fetchall()
+    prt(data)
+
+while True:
+    print("Enter 1 for Insert Records in the Database")
+    print("Enter 2 for searching records from the Database")
+    print("Enter 3 for updation")
+    print("Enter 4 to display all the records")
+    print("Enter 99 for exit")
+    ch=int(input("Enter your choice: "))
+    print()
+    
+    if ch==1:
+        creation()
+    if ch==2:
+        searching()
+    if ch==3:
+        updation()
+    if ch==4:
+        display()
+    if ch==99:
+        mycon.close()
+        break
